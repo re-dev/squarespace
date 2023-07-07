@@ -1,0 +1,16 @@
+.sqs-svg-icon--list {
+  a[href*="threads"] div svg {
+  display: none;
+  }
+  a[href*="threads"] div:before {
+    display: block;
+    content: "";
+    background: #FFF;
+    width: 100%;
+    height: 100%;
+    background-image: url("/s/logo_Threads-app.svg");
+    background-size: 24px; /* adjust size to suit XS / S / M / L / XL */
+    background-position: 50%;
+    background-repeat: no-repeat;
+  }
+}
