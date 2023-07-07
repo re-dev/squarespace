@@ -5,12 +5,9 @@
 .CodeMirror .CodeMirror-lines * { 
   font-family: Verdana !important;
 }
-
 .sqs-header-tray-content .header {
   display: none;
 }
-
 .CodeMirror-scroll  {
   height: 70vh !important;
 }
-
