@@ -1,0 +1,188 @@
+<style>
+/*_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+	animated clouds
+*/
+.cloud-banner {
+  //display: none;
+  width: 100%;
+  height: 100vh;
+ // background: hsla(344, 100%, 50%, 1);
+  //background: #333;
+  background: transparent;
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    filter: blur(80px);
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+  }
+}  
+</style>
+
+<!-- experimental animated background -->
+<div class="cloud-banner"></div>
+<script>
+// Clock taken from Three.js
+// @author alteredq / http://alteredqualia.com/
+// https://github.com/mrdoob/three.js/blob/master/src/core/Clock.js
+function Clock(autoStart) {
+  this.autoStart = autoStart !== undefined ? autoStart : true;
+  this.startTime = 0;
+  this.oldTime = 0;
+  this.elapsedTime = 0;
+  this.running = false;
+}
+Object.assign(Clock.prototype, {
+  start: function() {
+    this.startTime = (typeof performance === "undefined"
+      ? Date
+      : performance
+    ).now(); // see #10732
+    this.oldTime = this.startTime;
+    this.elapsedTime = 0;
+    this.running = true;
+  },
+  stop: function() {
+    this.getElapsedTime();
+    this.running = false;
+    this.autoStart = false;
+  },
+  getElapsedTime: function() {
+    this.getDelta();
+    return this.elapsedTime;
+  },
+  getDelta: function() {
+    var diff = 0;
+    if (this.autoStart && !this.running) {
+      this.start();
+      return 0;
+    }
+    if (this.running) {
+      var newTime = (typeof performance === "undefined"
+        ? Date
+        : performance
+      ).now();
+      diff = (newTime - this.oldTime) / 1000;
+      this.oldTime = newTime;
+      this.elapsedTime += diff;
+    }
+    return diff;
+  }
+});
+
+const banners = document.querySelectorAll(".gradient-banner");
+
+banners.forEach((banner, i) => {
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  canvas.id = `#canvas-${i}`;
+
+  banner.appendChild(canvas);
+
+  const clock = new Clock(true);
+  let ngons = [];
+  /*
+  const COLORS = [
+    "hsla(199,20%,98%,1)",
+    "hsla(200,92%,78%,1)",
+    "hsla(220,79%,59%,1)",
+    "hsla(354,82%,74%,1)",
+    "hsla(15,82%,94%,1)",
+    "hsla(32,86%,96%,1)"
+  ];  
+  */
+  const COLORS = [
+    "#F15D29",
+    "#F79520",
+    "#BD202E",
+    "#1F4497",
+    "#0F86C8",
+    "#C7EAFB"
+  ];    
+  let WIDTH = canvas.clientWidth;
+  let HEIGHT = canvas.clientHeight;
+  let SCALE = window.devicePixelRatio;
+
+  function resize() {
+    // Call this on window resize
+    SCALE = window.devicePixelRatio;
+    WIDTH = canvas.clientWidth;
+    HEIGHT = canvas.clientHeight;
+    canvas.width = WIDTH * SCALE;
+    canvas.height = HEIGHT * SCALE;
+    ctx.scale(SCALE, SCALE);
+  }
+
+  function polygon(n, r, x, y, theta, ctx) {
+    var step = (2 * Math.PI) / n;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(theta);
+    ctx.beginPath();
+    ctx.moveTo(r, 0); // Start from polar coord 0
+    for (var i = 0; i < n; i++) {
+      ctx.lineTo(r * Math.cos(i * step), r * Math.sin(i * step)); // Parametric circ
+    }
+    ctx.closePath();
+    ctx.stroke();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function generate() {
+    // Generate polygons
+    max_polygons = 10;
+    for (let i = 0; i < max_polygons; i++) {
+      ngons.push({
+        n: Math.max(Math.floor(Math.random() * 8), 3), // Random poly (with at least 3 sides)
+        r: Math.random() * 100 + 375, // Random radius between 375 - 475
+        x: WIDTH * Math.random(), // Random x on canvas
+        y: HEIGHT * Math.random(), // Random y on canvas
+        speed: Math.floor(Math.random() * (2.0 - 1.6 + 1)) + 1.6, // Velocity, random float from 1.6 to 2.0
+        color: COLORS[i % COLORS.length], // Pick color sequentially
+        direction: Math.PI * 2 * Math.random() // Random direction
+      });
+    }
+  }
+
+  function animate() {
+    const t = clock.getElapsedTime();
+    ctx.globalCompositeOperation = "screen";
+    ctx.clearRect(0, 0, WIDTH, HEIGHT);
+    for (var i = 0; i < ngons.length; i++) {
+      var ngon = ngons[i];
+      ctx.strokeStyle = ngon.color;
+      ctx.fillStyle = ngon.color;
+
+      // Move polygon in predef. direction
+      ngon.x += Math.cos(ngon.direction) * ngon.speed;
+      ngon.y += Math.sin(ngon.direction) * ngon.speed;
+
+      // Boundary check
+      var off = ngon.r + 30;
+      if (ngon.x > WIDTH + off) ngon.x = -off + 5;
+      if (ngon.y > HEIGHT + off) ngon.y = -off + 5;
+      if (ngon.x < -off) ngon.x = WIDTH + off - 5;
+      if (ngon.y < -off) ngon.y = HEIGHT + off - 5;
+
+      // Draw it
+      polygon(ngon.n, ngon.r, ngon.x, ngon.y, (i * Math.PI) / 2 + t / 5, ctx);
+    }
+    window.requestAnimationFrame(animate);
+  }
+  
+  generate(); // Generate polygons
+  resize(); // Resize canvas
+  window.requestAnimationFrame(animate); // Start animation loop
+  window.addEventListener("resize", resize, { passive: true }); // call resize() on window resize
+});
+</script>
