@@ -1,0 +1,6 @@
+/* shifted anchors */
+a[id="anchorname"] {
+  display: block;
+  position: relative;
+  top: -150px; /* set to header height */
+}
