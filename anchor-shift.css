@@ -2,5 +2,5 @@
 a[id="anchorname"] {
   display: block;
   position: relative;
-  top: -150px; /* set to header height */
+  top: -150px; /* tweak to suit */
 }
