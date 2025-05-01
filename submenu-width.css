@@ -1,0 +1,5 @@
+/* Drop-down Menu Auto Width */
+.header-nav-folder-content {
+    width: auto !important;
+    min-width: unset !important;
+}
