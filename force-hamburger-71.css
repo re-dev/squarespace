@@ -1,0 +1,11 @@
+/* force mobile hamburger menu on desktop */
+.header-nav, .header-actions { 
+  display: none; 
+}
+.header-burger { 
+  display: flex;
+}
+.header--menu-open .header-menu {
+  visibility: visible
+  opacity: 1;
+}
